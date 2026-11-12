@@ -1,0 +1,6 @@
+<launch>
+  <!-- Start simulation and tortoisebot_action_server.py first,
+        then run this with rostest and reuse-master -->
+  <!-- Passing tests, see waypoints_failing_test.test for the failing ones -->
+  <test test-name="waypoints_passing_test" pkg="tortoisebot_waypoints" type="waypoints_passing_test.py" time-limit="180.0" />
+</launch>
