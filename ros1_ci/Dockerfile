@@ -1,5 +1,6 @@
 # ROS Noetic + Gazebo, TortoiseBot simulation and tortoisebot_waypoints (Checkpoint 23)
 # Based on Jenkins Basics for Robotics, Lesson 10.3 Create a Docker image
+# Build from ~/simulation_ws/src: docker build -f ros1_ci/Dockerfile -t ros1_ci .
 FROM osrf/ros:noetic-desktop-full-focal
 
 # Tell container to use the C.UTF-8 locale for its language settings
@@ -26,7 +27,7 @@ RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin_make"
 RUN sed -i 's|source "/opt/ros/\$ROS_DISTRO/setup.bash"|source "/catkin_ws/devel/setup.bash"|g' /ros_entrypoint.sh
 
 # Script that starts simulation and runs waypoints tests
-COPY ./run_waypoints_test.sh /run_waypoints_test.sh
+COPY ./ros1_ci/run_waypoints_test.sh /run_waypoints_test.sh
 RUN chmod +x /run_waypoints_test.sh
 
 # Cleanup
