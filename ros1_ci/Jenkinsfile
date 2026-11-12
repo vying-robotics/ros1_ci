@@ -1,0 +1,25 @@
+// Based on Jenkins Basics for Robotics, 8.2 Running Tests in a Jenkins Pipeline
+pipeline {
+    agent any
+    stages {
+        stage('Build Docker image') {
+            steps {
+                // Jenkins workspace = repository root (~/simulation_ws/src in the rosject)
+                sh 'docker build -f ros1_ci/Dockerfile -t ros1_ci .'
+            }
+        }
+        stage('Run waypoints tests') {
+            steps {
+                // Starts TortoiseBot simulation (Gazebo, no GUI) and action server,
+                // runs the waypoints tests, then shuts Gazebo down
+                sh 'docker run --rm --name ros1_ci_test ros1_ci /run_waypoints_test.sh'
+            }
+        }
+    }
+    post {
+        always {
+            // Remove the test container if the build was aborted
+            sh 'docker rm -f ros1_ci_test > /dev/null 2>&1 || true'
+        }
+    }
+}
