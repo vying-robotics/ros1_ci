@@ -1,7 +1,8 @@
 #!/bin/bash
 # Based on Jenkins Basics for Robotics, Unit 2.1 Installing Jenkins (start_jenkins.sh)
-# Changes: Jenkins 2.479.3 (newer versions fail login behind the Academy proxy),
-# starts Docker for the CI jobs (installs it with ros1_ci/install_docker.sh if missing), no drone commands
+# Changes:
+#   - Starts Docker for the CI jobs (installs with ros1_ci/install_docker.sh if missing),
+#   - Copies github.com host keys to ~/.ssh/known_hosts
 
 # Exit on any error. If something fails, there's no use
 # proceeding further because Jenkins might not be able
@@ -26,6 +27,18 @@ if command -v docker > /dev/null; then
     sudo chmod 666 /var/run/docker.sock
 else
     bash ~/simulation_ws/src/ros1_ci/install_docker.sh
+fi
+
+# Copy github.com host keys (saved by setup_deploy_key.sh) to ~/.ssh/known_hosts,
+# Jenkins checks before reading the repository over SSH
+# ~/.ssh may not be kept when the rosject restarts (like lesson 7.2 setup_ssh_git.sh)
+if [ -f ~/webpage_ws/known_hosts ]; then
+    mkdir -p ~/.ssh
+    chmod 700 ~/.ssh
+    touch ~/.ssh/known_hosts
+    while read -r line; do
+        grep -qxF -- "$line" ~/.ssh/known_hosts || echo "$line" >> ~/.ssh/known_hosts
+    done < ~/webpage_ws/known_hosts
 fi
 
 # Download the Jenkins .war file, if not there already

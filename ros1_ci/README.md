@@ -15,8 +15,9 @@ Jenkins CI for the Checkpoint 23 `tortoisebot_waypoints` tests (ROS Noetic, Tort
   - `install_docker.sh` - installs and starts Docker in the rosject
   - `install_jenkins_plugins.sh` - downloads the Jenkins plugins (Pipeline + Git), versions for Jenkins 2.479.3
   - `start_jenkins.sh` - starts Docker and Jenkins (Jenkins home `~/webpage_ws/jenkins`)
+  - `setup_deploy_key.sh` - creates the GitHub SSH key Jenkins uses to read this repository and adds github.com to known hosts
   - `Jenkinsfile` - Jenkins pipeline: 
-    1. Builds docker image
+    1. Builds Docker image
     2. Runs tests in container
 
 ## Docker setup
@@ -100,13 +101,32 @@ cat ~/jenkins__pid__url.txt
    - **Skip and continue as admin** > **Not now** > **Start using Jenkins**
    - Change admin password: **admin** > **Configure** > **Password** > **Save**
 
-4. Create  project: **New Item** > `ros1_ci` > **Pipeline** > **OK**
+4. Set up deploy key (lesson 7.2) so Jenkins can read the repository over SSH:
+
+```bash
+bash ~/simulation_ws/src/ros1_ci/setup_deploy_key.sh
+```
+
+   - Prints the 3 items below (key and github.com host keys kept in `~/webpage_ws`)
+      1. Add public key on GitHub, `ros1_ci` > **Settings** > **Deploy keys** > **Add deploy key**
+          - Title `jenkins`
+          - **Allow write access**: not needed
+      2. Add private key on Jenkins, **Manage Jenkins** > **Credentials** > **(global)** > **Add credentials**
+          - Kind: **SSH Username with private key**
+            - ID: `ros1_ci_deploy_key`
+            - Description: `ros1_ci deploy key`
+            - Username: `git`
+          - Private Key: **Enter directly** > **Add**, paste key, Passphrase empty > **Create**
+
+5. Create project: **New Item** > `ros1_ci` > **Pipeline** > **OK**
    - Triggers: **Poll SCM**, Schedule `* * * * *` (checks repository every minute)
    - Pipeline: **Pipeline script from SCM**
-     - SCM **Git**, Repository URL `https://github.com/vying-robotics/ros1_ci.git` (public, no credentials)
-     - Branch Specifier `*/main`
-     - Script Path `ros1_ci/Jenkinsfile`
-   - **Save**, then **Build Now** once (first build downloads the ROS Noetic image, which takes several minutes; Poll SCM compares new commits with it)
+     - SCM **Git**
+        - Repository URL: `git@github.com:vying-robotics/ros1_ci.git`
+        - Credentials: `git (ros1_ci deploy key)`
+        - Branch Specifier: `*/main`
+     - Script Path: `ros1_ci/Jenkinsfile`
+   - **Save** and **Build Now** once (first build downloads ROS Noetic image, which takes several minutes)
 
 ## Start Jenkins
 
@@ -115,7 +135,7 @@ bash ~/simulation_ws/src/ros1_ci/start_jenkins.sh
 cat ~/jenkins__pid__url.txt
 ```
 
-- `start_jenkins.sh` installs Java and starts Docker (installs Docker if missing after a rosject restart)
+- `start_jenkins.sh` installs Java, starts Docker (installs Docker if missing after a rosject restart) and copies github.com host keys to `~/.ssh/known_hosts`
 
 Open Jenkins URL printed by the last command and log in:
 
@@ -125,7 +145,7 @@ Open Jenkins URL printed by the last command and log in:
 ## Test with a pull request
 
 1. Create pull request on `https://github.com/vying-robotics/ros1_ci` (e.g. add a small `.txt` file).
-2. Accept pull request and merged into `main`
+2. Accept pull request and merge into `main`
 3. Jenkins starts a new build of `ros1_ci`
 4. Open build under **Build History** > **Console Output**:
    - `Build Docker image`: image build

@@ -1,6 +1,6 @@
 #!/bin/bash
-# Downloads the Jenkins plugins used by the ros1_ci / ros2_ci pipelines (Pipeline + Git)
-# Versions pinned for Jenkins 2.479.3 (the update center now offers versions that need a newer Jenkins)
+# Downloads Jenkins plugins used by the ros1_ci / ros2_ci pipelines (Pipeline + Git)
+# Versions pinned for Jenkins 2.479.3
 # Run once with Jenkins stopped, then start Jenkins (start_jenkins.sh) and choose "None" in the plugin step
 
 set -e
