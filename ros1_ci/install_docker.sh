@@ -28,7 +28,8 @@ echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" |
   sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-sudo apt-get update -y
+
+sudo apt-get update -y || true  # Update Docker repository, even if update fails on other repositories
 
 # Install Docker packages:
 # containerd.io 1.7.23 includes runc 1.1.14
