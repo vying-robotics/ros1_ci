@@ -147,7 +147,14 @@ Open Jenkins URL printed by the last command and log in:
 1. Create pull request on `https://github.com/vying-robotics/ros1_ci` (e.g. add a small `.txt` file).
 2. Accept pull request and merge into `main`
 3. Jenkins starts a new build of `ros1_ci`
-4. Open build under **Build History** > **Console Output**:
-   - `Build Docker image`: image build
-   - `Run waypoints tests`: Gazebo + action server start, robot drives to goal twice, `rostest` summary `RESULT: SUCCESS`, `Stopping Gazebo...`, `Gazebo shut down`
-   - Desired result, `Finished: SUCCESS`
+4. Open build under **Build History** > **Console Output** (desired output):
+   1. `Build Docker image`: image build
+   2. `Run waypoints tests`: Gazebo + action server start, robot drives to goal twice, `rostest` summary `RESULT: SUCCESS`, `Stopping Gazebo...`, `Gazebo shut down`
+   3. `Finished: SUCCESS`: Last line
+
+
+# Task 1 Result
+
+Start of console output for first successful build,
+
+![task1_result](task1_result.png)
