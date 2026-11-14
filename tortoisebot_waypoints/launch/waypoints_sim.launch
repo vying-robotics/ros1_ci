@@ -1,11 +1,12 @@
 <?xml version="1.0" ?>
-<!-- TortoiseBot playground without Gazebo GUI (for Docker/Jenkins) + waypoints action server -->
+<!-- TortoiseBot playground with Gazebo GUI + waypoints action server (for Docker/Jenkins) -->
+<!-- gui:=false starts Gazebo without GUI (no display) -->
 <launch>
 
 	<arg name="x_pos" default="0.0"/>
 	<arg name="y_pos" default="0.0"/>
 	<arg name="z_pos" default="0.005"/>
-	<arg name="gui" default="false"/>
+	<arg name="gui" default="true"/>
 
 	<!-- Same as tortoisebot_gazebo/launch/tortoisebot_playground.launch, with gui as an argument -->
 	<param command="$(find xacro)/xacro $(find tortoisebot_description)/urdf/tortoisebot.xacro" name="robot_description"/>

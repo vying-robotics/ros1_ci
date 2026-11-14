@@ -10,9 +10,11 @@ pipeline {
         }
         stage('Run waypoints tests') {
             steps {
-                // Starts TortoiseBot simulation (Gazebo, no GUI) and action server,
+                // Starts TortoiseBot simulation (Gazebo with GUI) and action server,
                 // runs the waypoints tests, then shuts Gazebo down
-                sh 'docker run --rm --name ros1_ci_test ros1_ci /run_waypoints_test.sh'
+                sh 'echo "DISPLAY=$DISPLAY"'
+                sh 'xhost +local:root || true'
+                sh 'docker run --rm --name ros1_ci_test -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix ros1_ci /run_waypoints_test.sh'
             }
         }
     }

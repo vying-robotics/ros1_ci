@@ -5,9 +5,13 @@
 
 source /catkin_ws/devel/setup.bash
 
-# Start headless TortoiseBot simulation and waypoints action server in the background
+# Show Gazebo GUI on the display passed to the container
+if [ -n "$DISPLAY" ]; then GUI=true; else GUI=false; fi
+echo "Gazebo GUI: $GUI (DISPLAY=$DISPLAY)"
+
+# Start TortoiseBot simulation and waypoints action server in the background
 # Capture the process ID of that launch in SIM_ID
-roslaunch tortoisebot_waypoints waypoints_sim_headless.launch &
+roslaunch tortoisebot_waypoints waypoints_sim.launch gui:=$GUI &
 SIM_ID=$!
 
 # Wait for odometry and action server before running the tests
@@ -29,11 +33,12 @@ fi
 # Pause physics and stop gzserver before the other nodes: stopping everything at once
 echo "Stopping Gazebo..."
 rosservice call /gazebo/pause_physics
+pkill -TERM gzclient    # Gazebo GUI ignores SIGINT, stop it with SIGTERM
 pkill -INT gzserver
-timeout 30s bash -c 'while pgrep gzserver > /dev/null; do sleep 1; done'
+timeout 30s bash -c 'while pgrep gzserver > /dev/null || pgrep gzclient > /dev/null; do sleep 1; done'
 kill -INT $SIM_ID
 wait $SIM_ID
-if pgrep gzserver > /dev/null; then
+if pgrep gzserver > /dev/null || pgrep gzclient > /dev/null; then
     echo "Gazebo is still running"
     TEST_RESULT=1
 else

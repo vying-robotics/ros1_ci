@@ -5,7 +5,7 @@ Jenkins CI for the Checkpoint 23 `tortoisebot_waypoints` tests (ROS Noetic, Tort
 ## Packages
 - `tortoisebot/` - TortoiseBot simulation packages
 - `tortoisebot_waypoints/` - waypoints action server and tests from Checkpoint 23
-  - `launch/waypoints_sim_headless.launch` (simulation without Gazebo GUI + action server)
+  - `launch/waypoints_sim.launch` (simulation with Gazebo GUI + action server, `gui:=false` without GUI)
 - `ros1_ci/` - Checkpoint 24 files (this folder):
   - `Dockerfile` - ROS Noetic + Gazebo image with both packages built
   - `run_waypoints_test.sh` - runs in the container: 
@@ -72,10 +72,11 @@ rostest --reuse-master tortoisebot_waypoints waypoints_test.test
 
 The robot drives to the goal twice, giving result `RESULT: SUCCESS` with `TESTS: 2`. (For the failing tests use `waypoints_failing_test.test`.)
 
-Same tests in one command, without Gazebo GUI (what Jenkins runs):
+Same tests in one command with Gazebo GUI, for Jenkins:
 
 ```bash
-docker run --rm ros1_ci /run_waypoints_test.sh
+xhost +local:root
+docker run --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix ros1_ci /run_waypoints_test.sh
 ```
 
 ## Jenkins setup (run once)
@@ -149,7 +150,8 @@ Open Jenkins URL printed by the last command and log in:
 3. Jenkins starts a new build of `ros1_ci`
 4. Open build under **Build History** > **Console Output** (desired output):
    1. `Build Docker image`: image build
-   2. `Run waypoints tests`: Gazebo + action server start, robot drives to goal twice, `rostest` summary `RESULT: SUCCESS`, `Stopping Gazebo...`, `Gazebo shut down`
+   2. `Run waypoints tests`: `Gazebo GUI: true`, Gazebo + action server start, robot drives to goal twice, `rostest` summary `RESULT: SUCCESS`, `Stopping Gazebo...`, `Gazebo shut down`
+      - Gazebo window opens in the rosject (**Graphical Tools**) during this stage and closes at the end
    3. `Finished: SUCCESS`: Last line
 
 
